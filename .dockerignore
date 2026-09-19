@@ -1,0 +1,10 @@
+.git
+.gitignore
+.idea
+.vscode
+target
+frontend/node_modules
+frontend/.next
+frontend/out
+*.md
+Architecture.png
