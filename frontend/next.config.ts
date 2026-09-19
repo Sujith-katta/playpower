@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
-const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+const rawBackendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+const backendUrl = rawBackendUrl.startsWith('http://') || rawBackendUrl.startsWith('https://')
+  ? rawBackendUrl
+  : `http://${rawBackendUrl}`;
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -14,4 +17,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 

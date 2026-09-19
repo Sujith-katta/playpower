@@ -28,13 +28,10 @@ services:
     startCommand: npm run start
     autoDeploy: true
     envVars:
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: airbnb-clone-backend
-          property: url
       - key: BACKEND_URL
         fromService:
           type: web
           name: airbnb-clone-backend
-          property: url
+          property: hostport
+      - key: NEXT_PUBLIC_API_URL
+        value: /api
