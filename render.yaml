@@ -1,9 +1,9 @@
 services:
   # ----------------------------------------------------
-  # Spring Boot Java Backend Service
+  # Single Unified Web Service (Spring Boot + Embedded Next.js)
   # ----------------------------------------------------
   - type: web
-    name: airbnb-clone-backend
+    name: airbnb-clone
     env: docker
     dockerfilePath: ./Dockerfile
     plan: free
@@ -12,26 +12,3 @@ services:
     envVars:
       - key: PORT
         value: 10000
-      - key: ALLOWED_ORIGINS
-        value: "*"
-
-  # ----------------------------------------------------
-  # Next.js React Frontend Service
-  # ----------------------------------------------------
-  - type: web
-    name: airbnb-clone-frontend
-    env: node
-    plan: free
-    region: oregon
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    autoDeploy: true
-    envVars:
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: airbnb-clone-backend
-          property: hostport
-      - key: NEXT_PUBLIC_API_URL
-        value: /api

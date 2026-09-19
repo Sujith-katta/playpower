@@ -1,27 +1,47 @@
-# Stage 1: Build Java 17 Spring Boot application
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# ----------------------------------------------------
+# Stage 1: Build Next.js Frontend
+# ----------------------------------------------------
+FROM node:18-alpine AS frontend-builder
+WORKDIR /app/frontend
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+# ----------------------------------------------------
+# Stage 2: Build Spring Boot Backend with Embedded Frontend
+# ----------------------------------------------------
+FROM eclipse-temurin:17-jdk-alpine AS backend-builder
 WORKDIR /app
 
-# Copy Maven wrapper and POM file for dependency resolution
+# Copy Maven wrapper & POM
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN chmod +x mvnw
 
-# Download dependencies (cached layer)
+# Download Maven dependencies
 RUN ./mvnw dependency:go-offline -B || true
 
-# Copy source code and build application JAR
+# Copy Java source code
 COPY src ./src
+
+# Copy built static frontend files into Spring Boot static resources directory
+COPY --from=frontend-builder /app/frontend/out ./src/main/resources/static
+
+# Build Spring Boot executable JAR with embedded frontend
 RUN ./mvnw clean package -DskipTests
 
-# Stage 2: Minimal runtime environment
+# ----------------------------------------------------
+# Stage 3: Minimal Production Runtime
+# ----------------------------------------------------
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy built JAR artifact from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy the final self-contained JAR
+COPY --from=backend-builder /app/target/*.jar app.jar
 
-# Render passes PORT env variable dynamically
 ENV PORT=8080
 EXPOSE 8080
 
