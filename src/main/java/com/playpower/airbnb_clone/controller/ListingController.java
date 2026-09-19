@@ -11,8 +11,8 @@ import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/listings")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ListingController {
+
 
     private final ListingRepository listingRepository;
 
